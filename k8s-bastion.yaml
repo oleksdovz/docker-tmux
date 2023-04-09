@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bastion
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bastion
+spec:
+  selector:
+    matchLabels:
+      app: bastion
+  serviceName: "bastion"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bastion
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: bastion
+        image: odovzhan/tmux:latest
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: home
+          mountPath: /root
+  volumeClaimTemplates:
+  - metadata:
+      name: home
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "default"
+      resources:
+        requests:
+          storage: 1Gi
